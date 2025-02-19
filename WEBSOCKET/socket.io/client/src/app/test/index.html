@@ -1,0 +1,12 @@
+<html>
+<h1>Socket.io Example</h1>
+<button id="sendMessage">Send Message</button>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io(); 
+    document.getElementById("sendMessage").addEventListener("click", () => 
+    { 
+        socket.emit("chat message", "Hello from client!"); 
+    });
+</script>
+</html>
