@@ -1,34 +1,74 @@
 "use client";
-import React, { useEffect } from "react";
-import { io } from "socket.io-client";
+import { useState, useEffect } from "react";
+import io from "socket.io-client";
 
-const page = () => {
-  const connect = () => {
-    const socket = io("http://localhost:4000");
-    // client-side
-    socket.on("connect", () => {
-      console.log(socket.id); // x8WIv7-mJelg7on_ALbx
-      //   console.log("connected"); // x8WIv7-mJelg7on_ALbx
+const HomePage = () => {
+  const [isConnected, setIsConnected] = useState(false);
+  const [randomNumber, setRandomNumber] = useState(null);
+  const [socket, setSocket] = useState(null);
+
+  useEffect(() => {
+    // Clean up socket connection on unmount
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, []);
+
+  const connectToServer = () => {
+    const newSocket = io("http://localhost:4000"); // Your Express.js server URL
+
+    newSocket.on("connect", () => {
+      console.log("Connected to server");
+      setIsConnected(true);
+      setSocket(newSocket);
     });
+
+    newSocket.on("disconnect", () => {
+      console.log("Disconnected from server");
+      setIsConnected(false);
+      setSocket(null);
+      setRandomNumber(null); // Clear the random number
+    });
+
+    newSocket.on("randomNumber", (number) => {
+      setRandomNumber(number);
+    });
+
+    newSocket.on("chat message", (msg) => {
+      // setRandomNumber(number);
+      alert(msg);
+    });
+
+    newSocket.on("connect_error", (err) => {
+      console.error("Connection error:", err);
+      setIsConnected(false);
+    });
+
+    setSocket(newSocket);
   };
 
-  const disconnect = () => {
-    // socket.on("disconnect", () => {
-    //   console.log(socket.id); // undefined
-    // });
+  const disconnectFromServer = () => {
+    if (socket) {
+      socket.disconnect();
+    }
   };
 
   return (
     <div>
-      <button className="btn btn-primary" onClick={connect}>
-        Connect
-      </button>
-      <button className="btn btn-primary" onClick={disconnect}>
-        Disconnect
-      </button>
-      {/* <input type="text"></input> */}
+      <h1>Client</h1>
+      {!isConnected ? (
+        <button onClick={connectToServer}>Connect</button>
+      ) : (
+        <button onClick={disconnectFromServer}>Disconnect</button>
+      )}
+
+      {randomNumber !== null && (
+        <p>Random Number from Server: {randomNumber}</p>
+      )}
     </div>
   );
 };
 
-export default page;
+export default HomePage;
