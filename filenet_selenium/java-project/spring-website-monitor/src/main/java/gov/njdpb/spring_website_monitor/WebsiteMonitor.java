@@ -32,7 +32,7 @@ public  void checkWebsiteStatus() {
 
         System.out.println("URL is - " + url);
         checkWebsiteAvailability(url);
-        checkSSLCertificate();
+        checkSSLCertificate(url);
     }
 
 //    public static boolean checkWebsiteAvailability(String url) {
@@ -62,7 +62,7 @@ public boolean checkWebsiteAvailability(String url) {
     }
 
 //    public static boolean checkSSLCertificate() {
-public boolean checkSSLCertificate() {
+public boolean checkSSLCertificate(String url) {
 
         try {
             String hostname = url.replace("https://", "").replace("http://", "").split("/")[0];
